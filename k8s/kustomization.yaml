@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Deploy everything with: kubectl apply -k k8s/
+resources:
+  - configmap.yaml
+  - secret.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+# Set your real image here instead of editing deployment.yaml:
+# images:
+#   - name: sql-relationship-builder
+#     newName: your-registry.example.com/sql-relationship-builder
+#     newTag: "0.1.0"

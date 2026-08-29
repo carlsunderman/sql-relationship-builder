@@ -1,0 +1,43 @@
+thresholds:
+  name_similarity_min: 0.6
+  type_compatibility: strict
+  value_overlap_min: 3
+  value_overlap_ratio: 0.05
+  jaccard_min: 0.1
+  confidence_high: 0.85
+  confidence_medium: 0.70
+  confidence_low: 0.50
+  string_categorical_distinct_max: 20
+
+aliases:
+  api: [api_number, api_num, well_api, api_no, well_number]
+  lease: [lease_num, leasen, lease_number, lease_no, unit_num]
+  well: [well_name, wellname, well_no, well_num]
+  operator: [company, company_name, oper, operator_name, opr_name]
+  block: [block_num, blocknumber, blk_num, protr_number]
+  area: [area_code, area_name, protr_area_code]
+  date: [p_date, prod_date, production_date, activity_date, eff_date]
+  oil: [oil_prod, oill, oil_rate, oil_volume]
+  gas: [gas_prod, gass, gas_rate, gas_volume]
+  water: [water_prod, water_rate, water_volume]
+
+profiling:
+  mode_a_max_rows: 100000
+  mode_b_string_cardinality: 5000
+  mode_c_sample_sizes: [10000, 50000, 200000]
+  mode_c_confidence_threshold: 0.95
+  # Row count above which TABLESAMPLE is used for Mode B/C tables.
+  # Set to 0 to disable sampling entirely (always full scan).
+  tablesample_threshold: 500000
+  # Number of rows to include in each TABLESAMPLE when the threshold is exceeded.
+  tablesample_rows: 50000
+
+exclusions:
+  column_patterns: []
+  table_patterns: []
+
+graph:
+  # Maximum number of suggested (candidate) edges rendered in the pyvis graph.
+  # Only the top-N by confidence are shown; all confirmed edges are always shown.
+  # Set to 0 to hide suggested edges entirely.
+  max_suggested_edges: 100

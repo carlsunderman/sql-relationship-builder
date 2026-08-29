@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sql-relationship-builder
+  labels:
+    app: sql-relationship-builder
+spec:
+  # Streamlit holds per-user state in a server-side session tied to a websocket.
+  # Scaling beyond 1 replica requires sticky sessions at the Service/Ingress
+  # (see service.yaml sessionAffinity and ingress.yaml cookie affinity).
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sql-relationship-builder
+  template:
+    metadata:
+      labels:
+        app: sql-relationship-builder
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      containers:
+        - name: sql-relationship-builder
+          # Replace with your registry/repo:tag and push the built image there.
+          image: sql-relationship-builder:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8501
+          envFrom:
+            - configMapRef:
+                name: sql-relationship-builder-config
+            - secretRef:
+                name: sql-relationship-builder-secrets
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL

@@ -1,0 +1,213 @@
+# SQL Relationship Builder -- Runbook
+
+End-to-end execution guide for humans and AI agents.
+
+## Prerequisites
+
+- Python 3.10+
+- UV package manager (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- ODBC Driver 17 for SQL Server (or compatible)
+- Access to a SQL Server instance with read permissions
+
+## Quick Start
+
+```bash
+# 1. Clone / navigate to project
+cd streamlit_relationship_builder
+
+# 2. Install dependencies
+uv sync
+
+# 3. Configure (optional)
+cp config/defaults.yaml config/my_config.yaml
+# Edit config/my_config.yaml with your alias groups, thresholds, exclusions
+
+# 4. Launch
+uv run streamlit run app.py
+```
+
+## Step-by-Step Workflow
+
+### 1. Connect to SQL Server
+
+- Open the app at `http://localhost:8501`
+- Expand **Connections** panel (left sidebar)
+- Enter:
+  - **Server**: hostname or IP (e.g., `localhost\SQLEXPRESS`)
+  - **Database**: database name
+  - **Username** / **Password**: SQL Server credentials
+- Click **Connect**
+
+You can connect to multiple servers/databases simultaneously. Cross-server relationships will be detected.
+
+### 2. Browse and Select Tables
+
+- Expand **Tables** panel
+- All user tables from connected databases appear in a multi-select
+- Select the tables you want to include in the relationship set
+- Click **Load Selected Tables**
+
+On load, the app automatically:
+
+- Discovers schema (columns, types, indexes, foreign keys)
+- Runs profiling (null ratios, distinct counts, top values)
+- Runs string profiling (categorical detection, identifier patterns)
+- Adds existing FK constraints as confirmed edges
+
+### 3. Run Analysis Pipeline
+
+- Expand **Analysis** panel
+- Click **Run Profiling** (auto-run on table load, but can re-run)
+- Click **Run Analysis Pipeline**
+
+The pipeline:
+
+1. Generates candidate column pairs (exact name, alias, fuzzy match)
+2. Evaluates type compatibility (canonical type families)
+3. Computes value evidence (overlap, Jaccard, containment)
+4. Computes string evidence (categorical alignment, token similarity)
+5. Scores candidates with weighted formula
+6. Adds high/medium/low confidence candidates as suggested edges
+
+### 4. Review and Curate Relationships
+
+**Right panel:**
+
+- **Graph**: Interactive pyvis visualization (solid = confirmed, dashed = suggested)
+- **Suggested Relationships**: List of candidates with confidence scores
+  - Click **Accept** to confirm a relationship
+  - Click **Dismiss** to reject a suggestion
+- **Relationships**: Editable table for confirmed edges
+  - Change relationship type (one-to-one, one-to-many, many-to-one, many-to-many)
+  - Add/edit annotations
+  - Click **Remove** to delete a relationship
+
+**Add manually:**
+
+- Expand **Add Relationship Manually** (right panel)
+- Select source/target tables and columns
+- Choose relationship type
+- Click **Add Relationship**
+
+**Annotations:**
+
+- Expand **Annotations** (left panel)
+- Add descriptions to tables and relationships
+
+### 5. Monitor Schema Drift
+
+- Expand **Drift Monitoring** (left panel)
+- Click **Save Snapshot** to capture current schema state
+- On subsequent runs, click **Check Drift** to compare against snapshot
+- Reports: new tables, removed tables, column changes, type changes, row count changes
+- Download drift report as markdown
+
+### 6. Config Feedback Loop
+
+- Expand **Config Feedback** (left panel)
+- View current alias groups
+- Add new alias groups from your review decisions
+- Click **Export Updated Config** to download the modified config
+- Use the updated config in future runs for improved detection
+
+### 7. Export
+
+- Expand **Export** (left panel)
+- Set **Relationship Set Name**
+- Click **Export Markdown** for `.md` file with:
+  - YAML frontmatter (title, table count, relationship count)
+  - Source database list
+  - Table definitions with column types
+  - Relationship matrix
+  - Evidence summaries (for suggested edges)
+  - Mermaid ER diagram
+  - Annotations
+- Click **Export JSON** for machine-readable `.json` with:
+  - Full table metadata
+  - Relationships with types and annotations
+  - Suggested relationships with confidence and evidence
+  - Summary statistics
+
+### 8. Save and Restore
+
+- Expand **Save / Load** (left panel)
+- Click **Save** to persist current state to JSON (no credentials stored)
+- Click **Load** to restore a previous session
+
+## Configuration Reference
+
+All configuration lives in `config/defaults.yaml`:
+
+```yaml
+thresholds:
+  name_similarity_min: 0.6 # Minimum fuzzy name match score
+  type_compatibility: strict # "strict" or "relaxed"
+  value_overlap_min: 3 # Minimum overlapping values
+  value_overlap_ratio: 0.05 # Minimum overlap ratio
+  jaccard_min: 0.1 # Minimum Jaccard similarity
+  confidence_high: 0.85 # Threshold for "high" band
+  confidence_medium: 0.70 # Threshold for "medium" band
+  confidence_low: 0.50 # Threshold for "low" band
+  string_categorical_distinct_max: 20 # Max distinct for categorical
+
+aliases:
+  api: [api_number, api_num, well_api, api_no, well_number]
+  well: [well_name, wellname, well_no, well_num]
+  # Add your domain-specific aliases here
+
+profiling:
+  mode_a_max_rows: 100000 # Max rows for full pushdown
+  mode_b_string_cardinality: 5000
+
+exclusions:
+  column_patterns: [] # Column name patterns to exclude
+  table_patterns: [] # Table name patterns to exclude
+```
+
+## Architecture Overview
+
+```
+app.py (Streamlit UI)
+  |
+  +-- src/db.py           (SQL Server connection, schema discovery)
+  +-- src/metadata.py     (Extended metadata: indexes, FKs, row counts)
+  +-- src/profiler.py     (Adaptive profiling: Mode A/B/C)
+  +-- src/string_profiler.py  (String column analysis)
+  +-- src/candidates.py   (Candidate generation: exact/alias/fuzzy)
+  +-- src/type_compat.py  (Type compatibility evaluation)
+  +-- src/value_evidence.py   (Value overlap, Jaccard, containment)
+  +-- src/string_evidence.py  (Categorical alignment, token similarity)
+  +-- src/scoring.py      (Weighted confidence scoring)
+  +-- src/pipeline.py     (Pipeline orchestrator)
+  +-- src/graph.py        (Relationship graph: nodes, edges, serialization)
+  +-- src/export.py       (Markdown + Mermaid + JSON export)
+  +-- src/drift.py        (Schema drift detection)
+  +-- src/state.py        (JSON save/load)
+  +-- src/models.py       (Data models)
+  +-- src/types.py        (Type canonicalization via sqlglot)
+```
+
+## Quality Gates
+
+Run before release:
+
+```bash
+uv run python -m pytest tests/ -v
+```
+
+Gates checked:
+
+1. **Evidence completeness**: All scored edges have type + value evidence
+2. **Determinism**: Same config + same data = same outputs
+3. **No hardcoded names**: Core modules contain no literal table/column names
+4. **Config-driven**: Thresholds exist in `config/defaults.yaml`
+
+## Troubleshooting
+
+| Issue               | Fix                                                                           |
+| ------------------- | ----------------------------------------------------------------------------- |
+| Connection refused  | Check server name, ensure SQL Server is running, verify ODBC driver installed |
+| No candidates found | Lower `name_similarity_min` in config, add relevant aliases                   |
+| Too many candidates | Raise `name_similarity_min`, add exclusions for noise tables                  |
+| Graph not rendering | Check browser console for JS errors, try fewer tables                         |
+| Slow profiling      | Check `mode_a_max_rows` threshold, large tables use sampling                  |

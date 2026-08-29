@@ -1,0 +1,8 @@
+# Brand theme
+# Palette: Cyan Cobalt Blue #235BA8, navy #003070, Torch Red #DF2027, light gray #F1F1F1
+[theme]
+primaryColor = "#235BA8"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F1F1"
+textColor = "#1A1A2E"
+font = "sans serif"

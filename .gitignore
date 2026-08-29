@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.eggs/
+*.manifest
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Project specific
+docs/
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Configuration (users should copy .env.example to .env)
+.env.example
+
+# Configuration (users should copy config.yaml.example to config.yaml)
+config.yaml
+config.yml
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+*.gpg
+"report/"
+"relationships.json"
+
+# Admin panel
+admin/.encryption_key
+admin/admin_config.db
+
+# Local data and scratch
+graph_store.db
+error.txt
+latest_changes.md
+.pi-subagents/
+.pi-lens/
+.obsidian/
+.claude/

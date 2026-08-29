@@ -1,0 +1,26 @@
+# Optional. Assumes the ingress-nginx controller. Edit host/TLS for your cluster.
+# Long timeouts + cookie affinity keep Streamlit's websocket session stable.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sql-relationship-builder
+  labels:
+    app: sql-relationship-builder
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: sql-relationship-builder.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sql-relationship-builder
+                port:
+                  number: 80

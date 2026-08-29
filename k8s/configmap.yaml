@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sql-relationship-builder-config
+  labels:
+    app: sql-relationship-builder
+data:
+  # Provider selector: local | azure
+  LLM_PROVIDER: "azure"
+  # Azure OpenAI (non-secret settings)
+  AZURE_OPENAI_ENDPOINT: "https://your-resource.cognitiveservices.azure.com"
+  AZURE_OPENAI_DEPLOYMENT_NAME: "gpt-4o"
+  AZURE_OPENAI_API_VERSION: "2024-02-01"
+  AZURE_OPENAI_MODEL: "gpt-4o"
+  # Local OpenAI-compatible endpoint
+  LOCAL_OPENAI_ENDPOINT: "http://localhost:8080"
+  LOCAL_OPENAI_MODEL: "llama3"
+  # Set to "true" to verify TLS certs on the LLM endpoint
+  LLM_VERIFY_SSL: "false"

@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SQL Relationship Builder Config",
+  "type": "object",
+  "properties": {
+    "thresholds": {
+      "type": "object",
+      "properties": {
+        "name_similarity_min": {"type": "number", "minimum": 0, "maximum": 1},
+        "type_compatibility": {"type": "string", "enum": ["strict", "relaxed"]},
+        "value_overlap_min": {"type": "integer", "minimum": 1},
+        "value_overlap_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "jaccard_min": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence_high": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence_medium": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence_low": {"type": "number", "minimum": 0, "maximum": 1},
+        "string_categorical_distinct_max": {"type": "integer", "minimum": 1}
+      },
+      "required": [
+        "name_similarity_min", "type_compatibility", "value_overlap_min",
+        "value_overlap_ratio", "jaccard_min", "confidence_high",
+        "confidence_medium", "confidence_low", "string_categorical_distinct_max"
+      ]
+    },
+    "aliases": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_]+$": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "profiling": {
+      "type": "object",
+      "properties": {
+        "mode_a_max_rows": {"type": "integer", "minimum": 1},
+        "mode_b_string_cardinality": {"type": "integer", "minimum": 1},
+        "mode_c_sample_sizes": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1},
+          "minItems": 1
+        },
+        "mode_c_confidence_threshold": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "required": [
+        "mode_a_max_rows", "mode_b_string_cardinality",
+        "mode_c_sample_sizes", "mode_c_confidence_threshold"
+      ]
+    },
+    "exclusions": {
+      "type": "object",
+      "properties": {
+        "column_patterns": {"type": "array", "items": {"type": "string"}},
+        "table_patterns": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "required": ["thresholds", "aliases", "profiling", "exclusions"]
+}
