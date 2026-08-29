@@ -49,7 +49,7 @@ active one or delete it.
 
 ## Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - UV package manager (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
 - ODBC Driver 17 for SQL Server (or compatible)
 - Access to a SQL Server instance with read permissions

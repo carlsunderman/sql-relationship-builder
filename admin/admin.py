@@ -81,7 +81,7 @@ def _setup_initial_password() -> None:
     with st.form("setup_form"):
         password = st.text_input("Admin Password", type="password", key="setup_pw")
         confirm = st.text_input("Confirm Password", type="password", key="setup_confirm")
-        submitted = st.form_submit_button("Set Password")
+        submitted = st.form_submit_button("Set Password", key="submit_setup_password")
 
     if submitted:
         if not password:
@@ -101,7 +101,7 @@ def _show_login() -> None:
 
     with st.form("login_form"):
         password = st.text_input("Password", type="password", key="login_pw")
-        submitted = st.form_submit_button("Login")
+        submitted = st.form_submit_button("Login", key="submit_login")
 
     if submitted:
         if verify_admin_password(password):
@@ -125,7 +125,7 @@ def _show_admin() -> None:
 
     col_left, col_right = st.columns([0.7, 0.3])
     with col_right:
-        if st.button("Logout", use_container_width=True):
+        if st.button("Logout", use_container_width=True, key="logout"):
             _logout()
 
     tab_list, tab_edit, tab_connections, tab_graphs, tab_settings = st.tabs([
@@ -288,7 +288,7 @@ def _show_config_editor() -> None:
         )
 
         submitted = st.form_submit_button(
-            "Save Config", use_container_width=True, type="primary"
+            "Save Config", use_container_width=True, type="primary", key="submit_save_config"
         )
 
     if submitted:
@@ -328,7 +328,7 @@ def _show_settings() -> None:
         confirm_pw = st.text_input(
             "Confirm New Password", type="password", key="change_confirm_pw"
         )
-        pw_submitted = st.form_submit_button("Change Password")
+        pw_submitted = st.form_submit_button("Change Password", key="submit_change_password")
 
     if pw_submitted:
         if not verify_admin_password(current_pw):
@@ -365,7 +365,7 @@ def _show_settings() -> None:
 def _show_server_connections() -> None:
     st.header("Server Connections")
 
-    if st.button("New Connection", use_container_width=True):
+    if st.button("New Connection", use_container_width=True, key="new_connection"):
         st.session_state.pop("editing_connection_id", None)
         st.session_state._show_new_connection = True
         st.rerun()
@@ -447,7 +447,7 @@ def _show_connection_editor() -> None:
         )
 
         submitted = st.form_submit_button(
-            "Save Connection", use_container_width=True, type="primary"
+            "Save Connection", use_container_width=True, type="primary", key="submit_save_connection"
         )
 
     if st.button("Cancel", use_container_width=True, key="cancel_connection"):
@@ -706,9 +706,9 @@ def _show_graph_editor(graph_id: str) -> None:
         )
         save_cols = st.columns([1, 1, 4])
         with save_cols[0]:
-            submitted = st.form_submit_button("Save", use_container_width=True, type="primary")
+            submitted = st.form_submit_button("Save", use_container_width=True, type="primary", key="submit_save_graph")
         with save_cols[1]:
-            cancel = st.form_submit_button("Cancel", use_container_width=True)
+            cancel = st.form_submit_button("Cancel", use_container_width=True, key="cancel_graph")
 
     if submitted:
         g.name = new_name.strip()
