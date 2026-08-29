@@ -2,6 +2,29 @@
 
 End-to-end execution guide for humans and AI agents.
 
+## Overview
+
+SQL Relationship Builder is a Streamlit app that discovers, scores, and curates
+relationships (foreign keys and join paths) across SQL Server databases.
+
+- **Connect & discover** — attach to one or more SQL Server instances, browse
+  user tables, and auto-discover schema (columns, types, indexes, existing FK
+  constraints). Cross-server relationships are detected.
+- **Profile** — run column and string profiling (null ratios, distinct counts,
+  top values, categorical detection, identifier patterns) to gather evidence.
+- **Detect candidates deterministically** — generate candidate edges from name,
+  type-compatibility, value-overlap, and string-evidence heuristics, plus any
+  existing FK constraints, then score and rank them.
+- **Curate in a graph** — review candidates on an interactive NetworkX/pyvis
+  graph and accept, reject, or edit edges. Optional LLM-assisted candidate
+  discovery and a chat helper are available.
+- **Monitor drift** — snapshot the schema and detect schema drift over time.
+- **Export & persist** — emit JSON and Markdown reports and save/restore
+  relationship graphs.
+
+The rest of this document is the operational runbook: prerequisites, the
+step-by-step workflow, configuration reference, architecture, and troubleshooting.
+
 ## Prerequisites
 
 - Python 3.10+
