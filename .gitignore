@@ -29,8 +29,8 @@ env/
 *.swo
 *~
 
-# Project specific
-docs/
+# Project specific (keep docs/ADMIN.md tracked for the public repo)
+docs/*
 !docs/ADMIN.md
 *.log
 
