@@ -202,6 +202,34 @@ Gates checked:
 3. **No hardcoded names**: Core modules contain no literal table/column names
 4. **Config-driven**: Thresholds exist in `config/defaults.yaml`
 
+## Admin Panel
+
+A separate Streamlit page for managing AI provider configs, saved SQL Server connections, and saved relationship graphs.
+
+```bash
+streamlit run admin/admin.py --server.port 8550
+```
+
+Open http://localhost:8550. On first run you are prompted to set an admin password (stored as a bcrypt hash; there is no default).
+
+| Tab | Purpose |
+|-----|---------|
+| Configs | List, create, delete AI provider configs; set the active one |
+| Edit Config | Edit the selected config's endpoint, model, API key, parameters |
+| Server Connections | Saved SQL Server connections (server, user, encrypted password, allowed databases) |
+| Saved Graphs | List, edit, export, fork, and delete saved relationship graphs |
+| Settings | Change the admin password |
+
+The main app reads the active AI config and saved connections from the admin database on startup, falling back to environment variables when the database is empty. Full details in [docs/ADMIN.md](docs/ADMIN.md).
+
+With Docker Compose the admin panel is served at http://localhost:8550 alongside the main app.
+
+Storage and security:
+
+- `admin/admin_config.db` — SQLite database (auto-created, gitignored)
+- `admin/.encryption_key` — Fernet key for encrypting API keys and connection passwords (auto-generated, gitignored)
+- Admin password — bcrypt hash, plaintext never stored
+
 ## Troubleshooting
 
 | Issue               | Fix                                                                           |
