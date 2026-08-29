@@ -17,7 +17,8 @@ relationships (foreign keys and join paths) across SQL Server databases.
   existing FK constraints, then score and rank them.
 - **Curate in a graph** — review candidates on an interactive NetworkX/pyvis
   graph and accept, reject, or edit edges. Optional LLM-assisted candidate
-  discovery and a chat helper are available.
+  discovery and a natural-language chat over the connected database
+  ("Chat with your data") are available.
 - **Monitor drift** — snapshot the schema and detect schema drift over time.
 - **Export & persist** — emit JSON and Markdown reports and save/restore
   relationship graphs.
@@ -175,6 +176,47 @@ The pipeline:
 - Expand **Save / Load** (left panel)
 - Click **Save** to persist current state to JSON (no credentials stored)
 - Click **Load** to restore a previous session
+
+### 9. Chat with your data
+
+The **Chat** tab (next to **Graph**) lets you ask natural-language questions
+against the live database and get back SQL plus an answer.
+
+**Prerequisites:**
+
+- An AI provider is configured (active config from the admin panel, or set in
+  the **AI Configuration** left-panel section). Otherwise the tab shows
+  "Configure an LLM provider in the left panel first."
+- At least one graph is saved (**Save / Load**). Chat builds its schema context
+  from that graph's confirmed relationships (and high-confidence cross-user
+  suggestions).
+- A reachable connection to the graph's database server. The chat auto-connects
+  using the graph's `server\database`; if none is available it asks you to
+  connect or save a server connection in admin.
+
+**Usage:**
+
+- Pick a graph from the **Active graph** dropdown.
+- Type a question in **Ask a question** and click **Send** (or Ctrl+Enter).
+- Each turn renders the generated T-SQL in a collapsible **View SQL**, the
+  result set as a dataframe, and a plain-language **Answer**.
+
+**Pipeline:** question + graph schema → LLM generates a single T-SQL `SELECT`
+(temperature 0) → executes against the database → an answer synthesizer turns
+the result into prose.
+
+**Guardrails (read-only):**
+
+- Only `SELECT` / `WITH` statements run; DDL/DML/`EXEC` (INSERT, UPDATE, DELETE,
+  DROP, ALTER, MERGE, GRANT, etc.) are rejected before execution.
+- A `TOP (1000)` row cap is injected when absent, and a 30-second query timeout
+  applies.
+
+**Conversations:** multi-turn follow-ups reuse recent context (history pruned to
+the last 5 turns). Use **New Chat** to start fresh, **Clear** to wipe the current
+turns, and **Export** to surface a **Download conversation JSON** button
+(`chat_<graph>.json`) containing the questions, generated SQL, reasoning,
+answers, and result sets.
 
 ## Configuration Reference
 
