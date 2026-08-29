@@ -178,20 +178,20 @@ def _logo_data_uri() -> str:
     hotlinking an external asset.
     """
     logo_path = os.path.join(
-        os.path.dirname(__file__), "assets", "vintage-gas-pump-clip-art.jpg"
+        os.path.dirname(__file__), "assets", "sql-ontology-builder-logo.png"
     )
     if not os.path.exists(logo_path):
         return ""
     with open(logo_path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode("ascii")
-    return f"data:image/jpeg;base64,{encoded}"
+    return f"data:image/png;base64,{encoded}"
 
 
 def _render_header() -> None:
     """Render a full-width branded header with the app logo and colors."""
     logo_uri = _logo_data_uri()
     logo_html = (
-        f'<img src="{logo_uri}" alt="SQL Relationship Builder" style="height:54px;" />'
+        f'<img src="{logo_uri}" alt="SQL Ontology Builder" style="height:54px;" />'
         if logo_uri
         else ""
     )
