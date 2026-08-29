@@ -167,7 +167,6 @@ def load_config() -> Dict[str, Any]:
 
 # Brand palette
 BRAND_BLUE = "#235BA8"
-BRAND_NAVY = "#003070"
 BRAND_RED = "#DF2027"
 
 
@@ -178,7 +177,7 @@ def _logo_data_uri() -> str:
     hotlinking an external asset.
     """
     logo_path = os.path.join(
-        os.path.dirname(__file__), "assets", "sql-ontology-builder-logo.png"
+        os.path.dirname(__file__), "assets", "app-logo.png"
     )
     if not os.path.exists(logo_path):
         return ""
@@ -191,7 +190,7 @@ def _render_header() -> None:
     """Render a full-width branded header with the app logo and colors."""
     logo_uri = _logo_data_uri()
     logo_html = (
-        f'<img src="{logo_uri}" alt="SQL Ontology Builder" style="height:54px;" />'
+        f'<img src="{logo_uri}" alt="SQL Relationship Builder" style="height:54px;" />'
         if logo_uri
         else ""
     )
@@ -204,10 +203,6 @@ def _render_header() -> None:
                     box-shadow:0 1px 3px rgba(0,0,0,0.08);">
             {logo_html}
             <div style="border-left:3px solid {BRAND_RED}; padding-left:18px;">
-                <div style="font-size:1.55rem; font-weight:700;
-                            color:{BRAND_NAVY}; line-height:1.15;">
-                    SQL Relationship Builder
-                </div>
                 <div style="font-size:0.85rem; color:{BRAND_BLUE};
                             letter-spacing:0.04em;">
                     SQL Server Relationship Discovery
