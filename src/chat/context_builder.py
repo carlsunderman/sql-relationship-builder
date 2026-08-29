@@ -7,6 +7,9 @@ formats them into a system prompt the LLM can use to generate SQL.
 import logging
 from typing import Any, Dict, List, Optional
 
+import sqlglot
+from sqlglot import expressions as exp
+
 from src import graph_store
 from src.chat.models import GeneratedQuery
 
@@ -212,25 +215,42 @@ def extract_sql_from_response(text: str) -> Optional[str]:
 def validate_sql_safety(sql: str) -> Optional[str]:
     """Return an error message if the SQL is unsafe, else None.
 
-    Blocks any non-SELECT statement (DDL, DML, EXEC, etc.).
+    Enforces a single, read-only SELECT/WITH statement by parsing it with
+    sqlglot (T-SQL dialect) rather than matching forbidden-keyword substrings.
+    The old substring check was trivially bypassed by separating a write/DDL
+    statement with a ``;``, a newline, or a ``--`` / ``/**/`` comment, e.g.
+    ``SELECT 1; DROP TABLE x`` slipped through because `` DROP `` was never
+    space-delimited in the joined text. Fails closed: anything that does not
+    parse to exactly one SELECT-like query (including SELECT ... INTO, which
+    writes a new table) is rejected.
     """
     if not sql:
         return "Empty SQL"
 
     cleaned = sql.strip().rstrip(";").strip()
-    upper = cleaned.upper()
+    if not cleaned:
+        return "Empty SQL"
 
+    # Read queries must begin with SELECT or WITH (CTE).
+    upper = cleaned.upper()
     if not upper.startswith("SELECT") and not upper.startswith("WITH"):
         return "Only SELECT queries are allowed"
 
-    forbidden = [
-        "INSERT", "UPDATE", "DELETE", "DROP", "TRUNCATE", "ALTER",
-        "CREATE", "EXEC", "EXECUTE", "MERGE", "GRANT", "REVOKE",
-    ]
-    for kw in forbidden:
-        # Check for word boundary
-        if f" {kw} " in f" {upper} " or upper.startswith(kw):
-            return f"Forbidden keyword: {kw}"
+    try:
+        statements = [s for s in sqlglot.parse(cleaned, read="tsql") if s is not None]
+    except Exception as exc:  # sqlglot.ParseError and any tokenizer failure
+        return f"Unable to parse SQL: {exc}"
+
+    if len(statements) != 1:
+        return "Only a single statement is allowed"
+
+    root = statements[0]
+    if not isinstance(root, (exp.Select, exp.Union, exp.Subquery)):
+        return "Only SELECT queries are allowed"
+
+    # SELECT ... INTO materialises a new table -- a write, not a read.
+    if root.find(exp.Into) is not None:
+        return "Only SELECT queries are allowed"
 
     return None
 

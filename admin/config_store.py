@@ -26,15 +26,6 @@ ALL_PROVIDERS = [PROVIDER_AZURE, PROVIDER_LOCAL, PROVIDER_ANTHROPIC]
 ADMIN_DB_PATH = os.path.join(os.path.dirname(__file__), "admin_config.db")
 ENCRYPTION_KEY_PATH = os.path.join(os.path.dirname(__file__), ".encryption_key")
 
-# delete me!!
-import dotenv
-dotenv.load_dotenv(
-   "../env"
-)
-MONGODB_URI = os.getenv("MONGODB_URI")
-
-# end of delete
-
 # ---------------------------------------------------------------------------
 # Encryption
 # ---------------------------------------------------------------------------
