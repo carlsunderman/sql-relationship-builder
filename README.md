@@ -17,8 +17,10 @@ relationships (foreign keys and join paths) across SQL Server databases.
   existing FK constraints, then score and rank them.
 - **Curate in a graph** — review candidates on an interactive NetworkX/pyvis
   graph and accept, reject, or edit edges. Optional LLM-assisted candidate
-  discovery and a natural-language chat over the connected database
-  ("Chat with your data") are available.
+  discovery is available.
+- **Chat with your data** — ask natural-language questions about a saved graph;
+  the LLM drafts a read-only T-SQL query, runs it against the connected
+  database, and returns the result plus a plain-language answer.
 - **Monitor drift** — snapshot the schema and detect schema drift over time.
 - **Export & persist** — emit JSON and Markdown reports and save/restore
   relationship graphs.
