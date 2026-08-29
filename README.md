@@ -25,6 +25,25 @@ relationships (foreign keys and join paths) across SQL Server databases.
 The rest of this document is the operational runbook: prerequisites, the
 step-by-step workflow, configuration reference, architecture, and troubleshooting.
 
+## Screenshots
+
+### Main app
+
+![SQL Relationship Builder main app](assets/screenshots/sql-relationship-builder.jpg)
+
+The user-facing page: connections panel (left) for saved/manual SQL Server
+connections and table selection, with the relationship Graph and AI Chat tabs
+on the right.
+
+### AI Config Admin
+
+![AI Config Admin page](assets/screenshots/admin-panel.jpg)
+
+The admin panel (`admin/admin.py`) for managing AI provider configs, saved
+server connections, and saved graphs. Provider configs are created and edited
+from the "Edit Config" tab; the "Configs" tab lists them and lets you set the
+active one or delete it.
+
 ## Prerequisites
 
 - Python 3.10+

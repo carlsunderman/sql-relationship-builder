@@ -155,14 +155,10 @@ def _show_admin() -> None:
 def _show_config_list() -> None:
     st.header("Provider Configs")
 
-    if st.button("New Config", use_container_width=True):
-        st.session_state.pop("editing_config_id", None)
-        st.session_state.active_tab = 1
-
     configs = list_configs()
 
     if not configs:
-        st.info("No configs yet. Go to 'Edit Config' to create one.")
+        st.info("No configs yet. Go to the 'Edit Config' tab to create one.")
         return
 
     for cfg in configs:
@@ -175,20 +171,14 @@ def _show_config_list() -> None:
             masked = cfg.to_dict(mask_api_key=True)
             st.json(masked, expanded=False)
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
             with col1:
-                if st.button(
-                    "Edit", key=f"edit_{cfg.id}", use_container_width=True
-                ):
-                    st.session_state.editing_config_id = cfg.id
-                    st.session_state.active_tab = 1
-            with col2:
                 if st.button(
                     "Set Active", key=f"active_{cfg.id}", use_container_width=True
                 ):
                     cfg.is_active = True
                     save_config(cfg)
-            with col3:
+            with col2:
                 if st.button(
                     "Delete", key=f"del_{cfg.id}", use_container_width=True
                 ):
@@ -200,7 +190,19 @@ def _show_config_list() -> None:
 # ---------------------------------------------------------------------------
 
 def _show_config_editor() -> None:
-    editing_id = st.session_state.get("editing_config_id")
+    existing = list_configs()
+    options = ["<New config>"] + [f"{c.name} ({c.provider})" for c in existing]
+    label_to_id = {
+        f"{c.name} ({c.provider})": c.id for c in existing
+    }
+
+    picked = st.selectbox(
+        "Select config to edit",
+        options,
+        key="config_editor_pick",
+    )
+
+    editing_id = label_to_id.get(picked)
     config: Optional[ProviderConfig] = None
     is_new = False
 
@@ -307,8 +309,6 @@ def _show_config_editor() -> None:
 
         save_config(config)
         st.success(f"Config '{config.name}' saved.")
-        st.session_state.pop("editing_config_id", None)
-
 
 # ---------------------------------------------------------------------------
 # Settings

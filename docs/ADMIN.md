@@ -8,7 +8,8 @@ Streamlit-based admin page for managing AI provider settings, saved SQL Server c
 ┌─────────────────────────────────────────────┐
 │  Streamlit (admin/admin.py)                 │
 │  └─ Login page (bcrypt password hash)       │
-│  └─ Configs (create, edit, delete, activate)│
+│  └─ Configs (list, set active, delete)      │
+│  └─ Edit Config (create/edit via picker)    │
 │  └─ Server Connections (saved SQL servers)  │
 │  └─ Saved Graphs (list, edit, fork, delete) │
 │  └─ Settings (change password)              │
@@ -63,8 +64,8 @@ The main app reads the active AI config from the SQLite DB on startup.
 
 | Tab | Purpose |
 |-----|---------|
-| Configs | List, create, delete AI provider configs; mark one active |
-| Edit Config | Edit endpoint, model, API key, and generation parameters |
+| Configs | List AI provider configs; set one active; delete |
+| Edit Config | Create a new config or edit an existing one (name, provider, endpoint, model, API key, generation parameters) via the config picker |
 | Server Connections | Save SQL Server connections: server, user, password (Fernet-encrypted), allowed databases. The main app lists these in its connection picker |
 | Saved Graphs | Manage graphs saved from the main app: view node/edge preview, edit metadata, export JSON, fork, delete (two-click confirm) |
 | Settings | Change the admin password |
